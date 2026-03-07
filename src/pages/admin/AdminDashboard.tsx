@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { useLogoutMutation } from "@/features/auth/authApi"
+import { logout } from "@/features/auth/authSlice"
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux"
-import { logout } from "@/store/slices/authSlice"
-import { useLogoutMutation } from "@/store/api/authApi"
+import { useNavigate } from "react-router-dom"
+
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -27,7 +28,7 @@ export default function AdminDashboard() {
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Logout
             </Button>

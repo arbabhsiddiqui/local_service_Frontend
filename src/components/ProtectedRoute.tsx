@@ -1,30 +1,24 @@
+// components/ProtectedRoute.tsx
+
 import { Navigate } from "react-router-dom"
-import { useAppSelector } from "@/hooks/useRedux"
-import type { UserRole } from "@/store/slices/authSlice"
+import { useSelector } from "react-redux"
+import type { RootState } from "../app/store"
 
-interface ProtectedRouteProps {
-  children: React.ReactNode
-  requiredRoles?: UserRole[]
+interface Props {
+  children: JSX.Element
+  role?: string
 }
 
-export default function ProtectedRoute({
-  children,
-  requiredRoles,
-}: ProtectedRouteProps) {
-  const { isAuthenticated, user, isInitialLoad } = useAppSelector((state) => state.auth)
+const ProtectedRoute = ({ children, role }: Props) => {
 
-  if (isInitialLoad) {
-    return <div>Loading...</div> // Or a proper loading component
-  }
+  const { user } = useSelector((state: RootState) => state.auth)
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
+  if (!user) return <Navigate to="/login" />
 
-  // use `roleName` field (consistent with User shape)
-  if (requiredRoles && user && !requiredRoles.includes(user.roleName)) {
-    return <Navigate to="/unauthorized" replace />
-  }
+  if (role && user.role !== role)
+    return <Navigate to="/unauthorized" />
 
-  return <>{children}</>
+  return children
 }
+
+export default ProtectedRoute

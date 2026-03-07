@@ -1,19 +1,27 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { useEffect } from "react"
 import Login from "@/pages/Login"
-import AdminDashboard from "@/pages/dashboards/AdminDashboard"
-import ServiceUserDashboard from "@/pages/dashboards/ServiceUserDashboard"
-import ClientDashboard from "@/pages/dashboards/ClientDashboard"
+import AdminDashboard from "@/pages/admin/AdminDashboard"
 import Unauthorized from "@/pages/Unauthorized"
 import ProtectedRoute from "@/components/ProtectedRoute"
-import { useAuthRefresh } from "@/hooks/useAuthRefresh"
+import { useAuthBootstrap } from "@/hooks/useAuthBootstrap"
+import { useSelector } from "react-redux"
 
-function AppContent() {
-  // Initialize and manage token refresh
-  useAuthRefresh()
+
+function App() {
+
+    useAuthBootstrap()
+
+  const { isBootstrapping } = useSelector(
+    (state: RootState) => state.auth
+  )
+
+  if (isBootstrapping) {
+    return <div>Loading App...</div>
+  }
 
   return (
-    <Routes>
+    <Router>
+      <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -28,42 +36,16 @@ function AppContent() {
       />
 
       {/* Service User Dashboard */}
-      <Route
-        path="/dashboard/service-provider"
-        element={
-          <ProtectedRoute requiredRoles={["service_user"]}>
-            <ServiceUserDashboard />
-          </ProtectedRoute>
-        }
-      />
+     
 
       {/* Client User Dashboard */}
-      <Route
-        path="/dashboard/client"
-        element={
-          <ProtectedRoute requiredRoles={["client_user"]}>
-            <ClientDashboard />
-          </ProtectedRoute>
-        }
-      />
+      
 
      
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
-}
-
-function App() {
-  useEffect(() => {
-    // Apply dark theme
-    document.documentElement.classList.add("dark")
-  }, [])
-
-  return (
-    <Router>
-      <AppContent />
     </Router>
   )
 }

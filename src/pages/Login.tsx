@@ -9,11 +9,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+
 import { useNavigate } from "react-router-dom"
+import { useLoginMutation } from "@/features/auth/authApi"
+
+import { useSelector } from "react-redux"
+import type { RootState } from "@/app/store"
+
 import { useEffect } from "react"
-import { useLoginMutation } from "@/store/api/authApi"
-import { useAppDispatch } from "@/hooks/useRedux"
-import { setUser, setError } from "@/store/slices/authSlice"
 
 interface LoginFormData {
   email: string
@@ -21,9 +24,14 @@ interface LoginFormData {
 }
 
 export default function Login() {
+
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+
+  const { user } = useSelector((state: RootState) => state.auth)
+
+
   const [login, { isLoading }] = useLoginMutation()
+
   const form = useForm<LoginFormData>({
     defaultValues: {
       email: "demoadmin@chaicode.com",
@@ -32,63 +40,71 @@ export default function Login() {
   })
 
   async function onSubmit(data: LoginFormData) {
-    try {
-      const result = await login(data).unwrap()
-      dispatch(setUser(result.data.user))
 
-      // Redirect based on user role
-      switch (result.data.user.roleName) {
-        case "admin":
-          navigate("/dashboard/admin")
-          break
-        case "service_user":
-          navigate("/dashboard/service-provider")
-          break
-        case "client_user":
-          navigate("/dashboard/client")
-          break
-        default:
-          navigate("/login")
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Login failed"
-      dispatch(setError(errorMessage))
+    try {
+
+      await login(data).unwrap()
+
+      // login triggers /auth/me internally
+      // no manual dispatch needed
+
+    } catch (error) {
+
+      form.setError("root", {
+        message: "Invalid email or password",
+      })
     }
   }
 
   useEffect(() => {
-    if (isLoading) {
-      dispatch(setError(null))
+
+    if (!user) return
+
+    console.log(user)
+
+    switch (user.roleName) {
+
+      case "admin":
+        navigate("/dashboard/admin")
+        break
+
+      case "service_user":
+        navigate("/dashboard/service-provider")
+        break
+
+      case "client_user":
+        navigate("/dashboard/client")
+        break
+
+      default:
+        navigate("/")
     }
-  }, [isLoading, dispatch])
+
+  }, [user])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
+
       <div className="w-full max-w-md p-8 bg-card rounded-lg shadow-lg border border-border">
-        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">Login</h1>
+
+        <h1 className="text-2xl font-bold text-center mb-6 text-foreground">
+          Login
+        </h1>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
             <FormField
               control={form.control}
               name="email"
               rules={{
                 required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email format",
-                },
               }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Email</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="bg-input text-foreground placeholder:text-muted-foreground"
-                      {...field}
-                    />
+                    <Input type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -100,21 +116,12 @@ export default function Login() {
               name="password"
               rules={{
                 required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
               }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Password</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      className="bg-input text-foreground placeholder:text-muted-foreground"
-                      {...field}
-                    />
+                    <Input type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,12 +137,14 @@ export default function Login() {
             <Button
               type="submit"
               className="w-full"
-              disabled={form.formState.isSubmitting || isLoading}
+              disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
+
           </form>
         </Form>
+
       </div>
     </div>
   )
