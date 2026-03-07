@@ -65,15 +65,15 @@ export default function Login() {
     switch (user.roleName) {
 
       case "admin":
-        navigate("/dashboard/admin")
+        navigate("/admin")
         break
 
       case "service_user":
-        navigate("/dashboard/service-provider")
+        navigate("/service-provider")
         break
 
       case "client_user":
-        navigate("/dashboard/client")
+        navigate("/client")
         break
 
       default:

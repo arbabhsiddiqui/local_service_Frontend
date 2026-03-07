@@ -1,3 +1,4 @@
 export const TAGS = {
-  USER: "User"
+  USER: "User",
+  CATEGORY:"Category"
 }
