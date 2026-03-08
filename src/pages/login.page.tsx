@@ -34,8 +34,8 @@ export default function Login() {
 
   const form = useForm<LoginFormData>({
     defaultValues: {
-      email: "demoadmin@chaicode.com",
-      password: "Abc@123",
+      email: "",
+      password: "",
     },
   })
 
