@@ -10,7 +10,7 @@ import ProtectedRoute from "./routes/ProtectedRoute"
 import Register from "./pages/register.page"
 import { serviceRoutes } from "./routes/service.routes"
 import { userRoutes } from "./routes/user.routes"
-
+import RequireAuth from "./routes/RequireAuth"
 
 function App() {
 
@@ -29,31 +29,35 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route element={<Layout />}>
-          {/* ADMIN */}
-          <Route
-            path="/admin"
-            element={<ProtectedRoute allowedRoles={["admin"]} />}
-          >
-            {adminRoutes}
-          </Route>
 
-          <Route
-            path="/service"
-            element={<ProtectedRoute allowedRoles={["service_provider"]} />}
-          >
-            {serviceRoutes}
-          </Route>
+        <Route element={<RequireAuth />}>
+          <Route element={<Layout />}>
+            {/* ADMIN */}
+            <Route
+              path="/admin"
+              element={<ProtectedRoute allowedRoles={["admin"]} />}
+            >
+              {adminRoutes}
+            </Route>
 
-          <Route
-            path="/user"
-            element={<ProtectedRoute allowedRoles={["user"]} />}
-          >
-            {userRoutes}
-          </Route>
+            <Route
+              path="/service"
+              element={<ProtectedRoute allowedRoles={["service_provider"]} />}
+            >
+              {serviceRoutes}
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Route>
+            <Route
+              path="/user"
+              element={<ProtectedRoute allowedRoles={["user"]} />}
+            >
+              {userRoutes}
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Route> {/* end Layout */}
+        </Route> {/* end RequireAuth */}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

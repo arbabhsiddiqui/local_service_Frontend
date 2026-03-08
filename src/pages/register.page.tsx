@@ -234,7 +234,7 @@ export default function Register() {
                             Already have an account?{" "}
 
                             <Link
-                                to="/login"
+                                to="/"
                                 className="text-primary font-medium hover:underline"
                             >
                                 Login
