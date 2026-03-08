@@ -6,6 +6,6 @@ import { TAGS } from "@/types/apiTags"
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes:[TAGS.USER],
+  tagTypes:[TAGS.USER,TAGS.CATEGORY],
   endpoints: () => ({})
 })

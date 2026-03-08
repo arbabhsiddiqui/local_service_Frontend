@@ -1,4 +1,7 @@
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
   Table,
@@ -20,32 +23,69 @@ import {
   useUpdateCategoryMutation,
 } from "@/features/admin/category/categoryApi"
 
+
+
+/* ---------------- VALIDATION ---------------- */
+
+const categorySchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Category name is required")
+    .regex(
+      /^[A-Za-z][A-Za-z\s]*$/,
+      "Category must start with a letter and contain only letters"
+    ),
+})
+
+type FormValues = z.infer<typeof categorySchema>
+
 type Category = {
-  id: number
+  _id: string
   name: string
 }
 
+
+
+/* ---------------- COMPONENT ---------------- */
+
 export default function CategoryPage() {
 
-  const { data: categories = [], isLoading } = useGetAllCategoryQuery(undefined)
+  const { data: categories = { data: [] }, isLoading } =
+    useGetAllCategoryQuery(undefined)
 
   const [addCategory] = useAddCategoryMutation()
   const [updateCategory] = useUpdateCategoryMutation()
   const [deleteCategory] = useDeleteCategoryMutation()
 
-  const [name, setName] = useState("")
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
 
+
+  /* ---------------- REACT HOOK FORM ---------------- */
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(categorySchema),
+  })
+
+
+
+  /* ---------------- SUBMIT ---------------- */
+
+  const onSubmit = async (data: FormValues) => {
     try {
 
       if (editingId) {
 
         await updateCategory({
           id: editingId,
-          name,
+          name: data.name,
         }).unwrap()
 
         setEditingId(null)
@@ -53,24 +93,32 @@ export default function CategoryPage() {
       } else {
 
         await addCategory({
-          name,
+          name: data.name,
         }).unwrap()
 
       }
 
-      setName("")
+      reset()
 
     } catch (error) {
       console.error("Category mutation failed", error)
     }
   }
 
+
+
+  /* ---------------- EDIT ---------------- */
+
   const handleEdit = (category: Category) => {
-    setName(category.name)
-    setEditingId(category.id)
+    setEditingId(category._id)
+    setValue("name", category.name)
   }
 
-  const handleDelete = async (id: number) => {
+
+
+  /* ---------------- DELETE ---------------- */
+
+  const handleDelete = async (id: string) => {
     try {
       await deleteCategory(id).unwrap()
     } catch (error) {
@@ -78,14 +126,19 @@ export default function CategoryPage() {
     }
   }
 
+
+
   if (isLoading) {
     return <p>Loading categories...</p>
   }
 
+
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      {/* TABLE */}
+      {/* ---------------- TABLE ---------------- */}
+
       <div className="lg:col-span-2 bg-card border rounded-lg p-6">
 
         <h2 className="text-lg font-semibold mb-4">
@@ -106,10 +159,10 @@ export default function CategoryPage() {
 
           <TableBody>
 
-            {categories.map((category: Category) => (
-              <TableRow key={category.id}>
+            {categories.data.map((category: Category) => (
+              <TableRow key={category._id}>
 
-                <TableCell>{category.id}</TableCell>
+                <TableCell>{category._id}</TableCell>
 
                 <TableCell>{category.name}</TableCell>
 
@@ -126,7 +179,7 @@ export default function CategoryPage() {
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleDelete(category.id)}
+                    onClick={() => handleDelete(category._id)}
                   >
                     Delete
                   </Button>
@@ -142,34 +195,61 @@ export default function CategoryPage() {
 
       </div>
 
-      {/* FORM */}
+
+
+      {/* ---------------- FORM ---------------- */}
+
       <div className="bg-card border rounded-lg p-6">
 
         <h2 className="text-lg font-semibold mb-4">
           {editingId ? "Edit Category" : "Add Category"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+        >
 
           <div className="space-y-2">
+
             <Label>Category Name</Label>
 
             <Input
               placeholder="Enter category name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+              {...register("name")}
             />
+
+            {errors.name && (
+              <p className="text-sm text-red-500">
+                {errors.name.message}
+              </p>
+            )}
 
           </div>
 
-          <Button className="w-full">
 
+
+          <Button className="w-full">
             {editingId
               ? "Update Category"
               : "Create Category"}
-
           </Button>
+
+
+
+          {editingId && (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setEditingId(null)
+                reset()
+              }}
+            >
+              Cancel Edit
+            </Button>
+          )}
 
         </form>
 
