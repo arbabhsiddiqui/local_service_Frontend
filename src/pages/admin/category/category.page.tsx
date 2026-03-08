@@ -27,7 +27,7 @@ type Category = {
 
 export default function CategoryPage() {
 
-  const { data: categories = [], isLoading } = useGetAllCategoryQuery()
+  const { data: categories = [], isLoading } = useGetAllCategoryQuery(undefined)
 
   const [addCategory] = useAddCategoryMutation()
   const [updateCategory] = useUpdateCategoryMutation()

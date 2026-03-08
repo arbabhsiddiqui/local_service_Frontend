@@ -29,7 +29,7 @@ export const useAuthBootstrap = () => {
         dispatch(setAccessToken(res.accessToken))
 
         // fetch user after refresh (force refetch to ensure request runs)
-        dispatch(
+        dispatch<any>(
           authApi.endpoints.getMe.initiate(undefined, { forceRefetch: true })
         )
 

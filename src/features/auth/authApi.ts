@@ -18,7 +18,7 @@ export const authApi = api.injectEndpoints({
         body: credentials
       }),
 
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
 
         try {
 
@@ -38,7 +38,7 @@ export const authApi = api.injectEndpoints({
     getMe: builder.query<{ data: User }, void>({
       query: () => "/user/me",
       providesTags: [TAGS.USER],
-        async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
 
         try {
 
@@ -56,7 +56,7 @@ export const authApi = api.injectEndpoints({
         method: "POST"
       }),
 
-      async onQueryStarted(arg, { dispatch }) {
+      async onQueryStarted(_arg, { dispatch }) {
         dispatch(logout())
       }
     }),

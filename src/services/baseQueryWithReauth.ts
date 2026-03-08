@@ -1,6 +1,6 @@
 
 import {fetchBaseQuery} from "@reduxjs/toolkit/query"
-import type {FetchArgs,FetchBaseQueryError} from '@reduxjs/toolkit/query'
+import type {FetchArgs} from '@reduxjs/toolkit/query'
 
 import { Mutex } from "async-mutex"
 import type { RootState } from "../app/store"

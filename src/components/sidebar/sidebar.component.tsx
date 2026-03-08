@@ -5,11 +5,19 @@ import { Button } from "@/components/ui/button"
 import { PanelLeft } from "lucide-react"
 import { useState } from "react"
 
+export type SidebarItem = {
+  title: string
+  icon: React.FC<any> // lucide components
+  path: string
+}
+
 export default function Sidebar() {
   const { user } = useAppSelector((state) => state.auth)
   const [collapsed, setCollapsed] = useState(false)
 
-  const items = sidebarConfig[user?.roleName || "user"]
+  // narrow role to keys of the config to satisfy TypeScript
+  const role = (user?.roleName || "user") as keyof typeof sidebarConfig
+  const items: SidebarItem[] = sidebarConfig[role] as SidebarItem[]
 
   return (
     <aside
@@ -29,7 +37,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="p-2 space-y-2">
-        {items.map((item) => {
+        {items.map((item: SidebarItem) => {
           const Icon = item.icon
 
           return (

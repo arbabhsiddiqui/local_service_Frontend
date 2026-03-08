@@ -1,7 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom"
 import { useAppSelector } from "@/hooks/useRedux"
 
-export default function ProtectedRoute({ allowedRoles }) {
+interface ProtectedRouteProps {
+  allowedRoles: string[]
+}
+
+export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const { user } = useAppSelector((state) => state.auth)
 
   if (!user) {
