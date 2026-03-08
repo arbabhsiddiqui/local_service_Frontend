@@ -54,7 +54,7 @@ export default function Register() {
 
     const [registerUser, { isLoading }] = useRegisterMutation()
 
-    const { data: roles = { data: [] }, isLoading: roleLoading } =
+    const { data: roles = { data: [] } } =
         useGetAllUserTypeQuery(undefined)
 
     const form = useForm<RegisterFormData>({
