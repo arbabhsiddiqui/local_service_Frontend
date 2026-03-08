@@ -7,8 +7,17 @@ export const authApi = api.injectEndpoints({
 
   endpoints: (builder) => ({
 
+    register: builder.mutation<any, any>({
+      query: (credentials) => ({
+        url: "/user/register",
+        method: "POST",
+        body: credentials
+      }),
+    }),
+
+
     login: builder.mutation<
-     { data: { accessToken: string } },
+      { data: { accessToken: string } },
       { email: string; password: string }
     >({
 
@@ -26,19 +35,19 @@ export const authApi = api.injectEndpoints({
 
           dispatch(setAccessToken(data.data.accessToken))
 
-        await dispatch(
-          // forceRefetch to ensure we fetch user even if cached
-          authApi.endpoints.getMe.initiate(undefined, { forceRefetch: true })
-        ).unwrap()
+          await dispatch(
+            // forceRefetch to ensure we fetch user even if cached
+            authApi.endpoints.getMe.initiate(undefined, { forceRefetch: true })
+          ).unwrap()
 
-        } catch {}
+        } catch { }
       }
     }),
 
     getMe: builder.query<{ data: User }, void>({
       query: () => "/user/me",
       providesTags: [TAGS.USER],
-        async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
 
         try {
 
@@ -46,7 +55,7 @@ export const authApi = api.injectEndpoints({
 
           dispatch(setUser(data.data))
 
-        } catch {}
+        } catch { }
       }
     }),
 
@@ -62,11 +71,12 @@ export const authApi = api.injectEndpoints({
     }),
 
     refresh: builder.mutation<{ accessToken: string }, void>({
-  query: () => ({
-    url: "/user/refresh-token",
-    method: "POST"
-  })
-}),
+      query: () => ({
+        url: "/user/refresh-token",
+        method: "POST"
+      })
+    }),
+
 
   })
 })
@@ -75,5 +85,6 @@ export const {
   useRefreshMutation,
   useLoginMutation,
   useGetMeQuery,
-  useLogoutMutation
+  useLogoutMutation,
+  useRegisterMutation
 } = authApi

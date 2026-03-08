@@ -14,8 +14,8 @@ export const sidebarConfig = {
     { title: "Settings", icon: Settings, path: "/admin/settings" }
   ],
 
-  manager: [
-    { title: "Dashboard", icon: LayoutDashboard, path: "/manager" },
+  service_provider: [
+    { title: "Dashboard", icon: LayoutDashboard, path: "/service" },
     { title: "Services", icon: Briefcase, path: "/manager/services" },
     { title: "Reports", icon: FileText, path: "/manager/reports" }
   ],

@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useLoginMutation } from "@/features/auth/authApi"
 
 import { useSelector } from "react-redux"
@@ -68,12 +68,12 @@ export default function Login() {
         navigate("/admin")
         break
 
-      case "service_user":
-        navigate("/service-provider")
+      case "service_provider":
+        navigate("/service")
         break
 
-      case "client_user":
-        navigate("/client")
+      case "user":
+        navigate("/user")
         break
 
       default:
@@ -143,6 +143,15 @@ export default function Login() {
             </Button>
 
           </form>
+          <div className="mt-10 text-sm text-center text-muted-foreground">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-primary font-medium hover:underline"
+            >
+              Register
+            </Link>
+          </div>
         </Form>
 
       </div>
